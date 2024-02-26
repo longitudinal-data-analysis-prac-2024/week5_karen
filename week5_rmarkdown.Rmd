@@ -1,0 +1,123 @@
+# Karen's Week 5 Work
+
+## Instructions
+
+The following exercises are a test in disguise. What do you think about the coding? Can you think of any improvements to the following?
+
+## Preparations
+
+### Installing packages
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+### Loading datasets
+
+```{r}
+aq = readRDS("anscombe_quartet.rds")
+dd = readRDS("datasaurus_dozen.rds")
+```
+
+## PROBLEM 1
+
+Visualizing your data is important! Summary statistics can be highly misleading, and simply plotting the data can reveal a lot more! Lets look at the Anscombe’s Quartet data. There are four different data sets.
+
+*Anscombe, F. J. (1973). "Graphs in Statistical Analysis". American Statistician. 27 (1): 17–21. <doi:10.1080/00031305.1973.10478966>. JSTOR 2682899.*
+
+### Data exploration
+
+```{r}
+str(aq)
+```
+
+*Q: What does the function str() do?*
+
+A: It displays the internal structure of the dataset.
+
+```{r}
+aq %>% group_by(dataset) %>% 
+  summarise( mean_x =mean(x), 
+             mean_y = mean(y), 
+             min_x = min(x), 
+             min_y = min(y), 
+             max_x = max(x), 
+             max_y = max(y), 
+             crrltn = cor(x, y) )
+```
+
+*Q: what do the summary statistics tell us about the different datasets?*
+
+A: All datasets have identical mean values of x and y, and highly similar correlations, but have distinct min and max x and y values.
+
+### Data visualisation
+
+```{r}
+plot1 <- ggplot(aq, aes(x=x,y=y)) + 
+  geom_point() +
+  geom_smooth(method = "lm",formula = "y ~ x") + facet_wrap(~dataset)
+
+ggsave("plot1.png", width = 20, height = 20, units = "cm")
+```
+
+*Q: what do the plots tell us about the different datasets?*
+
+A: it visualises the relationship between x and y values in each dataset
+
+*Q: describe the relationship between x and y in the different datasets.*
+
+A: 1. fairly linear 2. quadratic 3. very linear with what looks like an outlier 4. all data points except 1 have the same x value and different y values
+
+*Q: would linear regression be an appropriate statistical model to analyse the x-y relationship in each dataset?*
+
+A: It is suitable for 3 and potentially for 1, but not for 2 and 4
+
+*Q: what conclusions can you draw for the plots and summary statistics?*
+
+A: summary statistics don't accurately capture characteristics of the dataset, so visualisation is very important.
+
+## PROBLEM 2
+
+### Data exploration
+
+```{r}
+summary(dd)
+```
+
+*Q: how many rows and columns does the datasaurus_dozen file have?*
+
+A: 2 columns and 1846 rows
+
+### Data visualisation
+
+```{r}
+ggplot(dd, aes(x=x,y=y)) + geom_point() + facet_wrap(~dataset)
+```
+
+*Q: calculate the correlations and summary statistics for x and y in all datasets:*
+
+```{r}
+# A:
+dd %>% 
+  group_by(dataset) %>% 
+  summarise( mean_x = mean(x), 
+             mean_y = mean(y), 
+             min_x = min(x), 
+             min_y = min(y), 
+             max_x = max(x), 
+             max_y = max(y),
+             crrltn = cor(x, y) )
+```
+
+*Q: Plot the relationships between x and y in each dataset including the line of best fit.*
+
+```{r}
+# A:
+plot2 <- ggplot(dd, aes(x=x,y=y)) + geom_point() + geom_smooth(method = "lm",formula = "y ~ x") + facet_wrap(~dataset)
+ggsave("plot2.png")
+```
+
+*Q: what conclusions can you draw for the plots and summary statistics?*
+
+A: plots represent different images, x and y vales are not correlated in a linear manner in any of the datasets, which is not represented in the summary statistics.
